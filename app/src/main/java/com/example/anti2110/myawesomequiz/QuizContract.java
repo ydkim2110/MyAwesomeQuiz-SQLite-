@@ -15,5 +15,4 @@ public final class QuizContract {
         public static final String COLUMN_ANSWER_NR = "answer_nr";
     }
 
-
 }

@@ -1,5 +1,6 @@
 package com.example.anti2110.myawesomequiz;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +17,8 @@ import java.util.List;
 
 public class QuizActivity extends AppCompatActivity {
 
+    public static final String EXTRA_SCORE = "extraScore";
+
     private TextView tv_question;
     private TextView tv_score;
     private TextView tv_question_count;
@@ -29,12 +32,14 @@ public class QuizActivity extends AppCompatActivity {
     private ColorStateList textColorDefaultRb;
 
     private List<Question> questionList;
-    private int quetionCounter;
+    private int questionCounter;
     private int questionCountTotal;
     private Question currentQuestion;
 
     private int score;
     private boolean answered;
+
+    private long backPressedTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +115,7 @@ public class QuizActivity extends AppCompatActivity {
                 break;
         }
 
-        if(quetionCounter < questionCountTotal) {
+        if(questionCounter < questionCountTotal) {
             btn_confirm_next.setText("Next");
         } else {
             btn_confirm_next.setText("Finish");
@@ -123,16 +128,16 @@ public class QuizActivity extends AppCompatActivity {
         rb3.setTextColor(textColorDefaultRb);
         radioGroup.clearCheck();
 
-        if(quetionCounter < questionCountTotal) {
-            currentQuestion = questionList.get(quetionCounter);
+        if(questionCounter < questionCountTotal) {
+            currentQuestion = questionList.get(questionCounter);
 
             tv_question.setText(currentQuestion.getQuestion());
             rb1.setText(currentQuestion.getOption1());
             rb2.setText(currentQuestion.getOption2());
             rb3.setText(currentQuestion.getOption3());
 
-            quetionCounter++;
-            tv_question_count.setText("Question: "+quetionCounter+"/"+questionCountTotal);
+            questionCounter++;
+            tv_question_count.setText("Question: "+ questionCounter +"/"+questionCountTotal);
             answered = false;
             btn_confirm_next.setText("Confirm");
 
@@ -143,7 +148,19 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void finishQuiz() {
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra(EXTRA_SCORE, score);
+        setResult(RESULT_OK, resultIntent);
         finish();
     }
 
+    @Override
+    public void onBackPressed() {
+        if(backPressedTime + 2000 > System.currentTimeMillis()) {
+            finishQuiz();
+        } else {
+            Toast.makeText(this, "Press back again to finish", Toast.LENGTH_SHORT).show();
+        }
+        backPressedTime = System.currentTimeMillis();
+    }
 }
